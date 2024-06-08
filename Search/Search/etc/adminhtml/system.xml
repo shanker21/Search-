@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="Apetito" sortOrder="2001">
+            <label>Apetito</label>
+        </tab>
+        <section id="Apetito_searchconfig" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Search configuration</label>
+            <tab>Apetito</tab>
+            <resource>Apetito_Search::config_searchconfig</resource>
+            <group id="search_store" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Store Config</label>
+               <field id="store_view" translate="label" type="multiselect" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Store View</label>
+                    <source_model>Magento\Store\Model\System\Store</source_model>
+                </field>
+            </group>
+            <group id="parent" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+               <label>Parent ID</label>
+               <field id="parent_id" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                </field>
+            </group>
+            <group id="search_result" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+               <label>Search Results</label>
+               <field id="active" translate="label" sortOrder="20" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Meta Description</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,47 @@
+<?php
+/** @var \Apetito\Search\Block\Index\Index $block */
+$query = $block->getData('query');
+$metaDataJson = $block->getMetaData();
+$showMetaDesc = $block->isMetaDescriptionEnable();
+
+$metaDataArray = json_decode($metaDataJson, true);
+$filteredResults = array_filter($metaDataArray, function($item) use ($query) {
+    return @stripos($item['searchData'], $query) !== false;
+});
+?>
+<?php
+    echo $this->getLayout()
+        ->createBlock('Magento\Cms\Block\Block')
+        ->setBlockId('search_result_images')
+        ->toHtml();
+?>
+<div class="search-results-container">
+    <h1><?php echo __('Search Results for "%1"', $query); ?></h1>
+</div>
+<div class="searchres-list">
+    <?php if (count($filteredResults) > 0): ?>
+        <div>
+            <ul>
+                <?php foreach ($filteredResults as $result): ?>
+                    <li>
+                        <div>
+                            <a target="_blank" href="<?php echo $result['value']; ?>">
+                            <div class="searchres-head">
+                                    <h3><?php echo $result['label']; ?></h3>
+                                    <?php if ($showMetaDesc) { ?>
+                                        <p><?php echo $result['description']; ?></p>
+                                    <?php } ?>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php else: ?>
+        <div>
+            <p class="search-no-results"><?php echo __('Unfortunately there are no results for "%1", visit our news page to stay up to date with the latest advancements at apetito.', $query); ?></p>
+        </div>
+    <?php endif; ?>
+</div>
+

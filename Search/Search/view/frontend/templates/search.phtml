@@ -1,0 +1,129 @@
+<style>
+    .ui-autocomplete {
+        z-index: 10000000;
+    }
+
+    .search-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .search-ico {
+        cursor: pointer;
+        fill: #ccc; /* Change the color as needed */
+    }
+
+    #search {
+        width: 0;
+        padding: 10px;
+        box-sizing: border-box;
+        border: none;
+        outline: none;
+        transition: width 0.3s ease;
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    .search-container.active #search {
+        width: 100%;
+        visibility: visible;
+        opacity: 1;
+        border: 1px solid #ccc; /* Add border to make input visible when active */
+        padding: 10px 10px 10px 40px; /* Adjust padding for the icon */
+    }
+
+    .filter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<div class="filter">
+    <form id="search-form" method="get" action="<?php echo $block->getUrl('search/list/view'); ?>">
+        <div class="search-container">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0,0,256,256" width="20px" height="20px" class="search-ico">
+            <g fill="#105334" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal">
+                <g transform="scale(5.12,5.12)">
+                    <path d="M21,3c-9.39844,0 -17,7.60156 -17,17c0,9.39844 7.60156,17 17,17c3.35547,0 6.46094,-0.98437 9.09375,-2.65625l12.28125,12.28125l4.25,-4.25l-12.125,-12.09375c2.17969,-2.85937 3.5,-6.40234 3.5,-10.28125c0,-9.39844 -7.60156,-17 -17,-17zM21,7c7.19922,0 13,5.80078 13,13c0,7.19922 -5.80078,13 -13,13c-7.19922,0 -13,-5.80078 -13,-13c0,-7.19922 5.80078,-13 13,-13z"></path>
+                </g>
+            </g>
+        </svg>
+            <input type="text" name="search" id="search" autocomplete="off" placeholder="Search" />
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+require(['jquery', 'jquery/ui'], function($) { 
+    $(document).ready(function() {
+        var metaDataArray = <?php echo $block->getMetaData(); ?>;
+
+        console.log(metaDataArray);
+
+        $('.search-ico').on('click', function() {
+            $('.search-container').toggleClass('active');
+            if ($('.search-container').hasClass('active')) {
+                $('#search').focus();
+               // $('.burger-menu-bar3').removeClass('active');
+            }
+            //$('.burger-menu-bar3').removeClass('active');
+            // if ($(window).width() < 768) { // Adjust breakpoint as needed
+            //     $('.nav-open').removeClass('active'); // Replace with your menu's active class
+            // }
+        });
+
+        $('#search').autocomplete({
+            source: function(request, response) {
+                var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                var query = $('#search').val();
+                var results = $.grep(metaDataArray, function(value) {
+                    return matcher.test(value.label) || matcher.test(value.description) || matcher.test(value.value);
+                });
+
+                if (results.length > 0 || results.length > 5) {
+                    results = results.slice(0, 5);
+                    results.push({
+                        label: "See All Results",
+                        value: "<?php echo $block->getUrl('search/list/view'); ?>?search="+query
+                    });
+                }
+
+                response(results);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                
+                event.preventDefault();
+                
+                window.location.href = ui.item.value;
+                $('#search-form')[0].reset();
+            }
+        }).data('ui-autocomplete')._renderItem = function(ul, item) {
+            var listItem = $('<li>');
+            var anchor = $('<a>').attr('href', item.value).appendTo(listItem);
+            var divLabel = $('<div>').text(item.label).appendTo(anchor);
+            
+            if (item.label === "See All Results") {
+                divLabel.addClass('result-title');
+            }
+
+            return listItem.appendTo(ul);
+        };
+
+        $('.searchbox-icon').on('click', function() {
+            $('#search').toggle().focus();
+        });
+        $(document).on('click', function(event) {
+            var $target = $(event.target);
+            //console.log($target);
+            if (!$target.closest('.search-ico').length) {
+                $('.search-container').removeClass('active');
+                $('#search').val(''); // Clear the input field
+            }
+        });
+    });
+});
+</script>
