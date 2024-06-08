@@ -1,10 +1,15 @@
 <?php
 /** @var \Apetito\Search\Block\Index\Index $block */
+//get query and metadata from block file
 $query = $block->getData('query');
 $metaDataJson = $block->getMetaData();
 $showMetaDesc = $block->isMetaDescriptionEnable();
-
+//convert the metadata into JSON
 $metaDataArray = json_decode($metaDataJson, true);
+//The array_filter() function filters the values of an array using a callback function.
+//This function passes each value of the input array to the callback function. If the callback function returns true, the current value from input is returned into the result array. Array keys are preserved.
+//The stripos() function finds the position of the first occurrence of a string inside another string.
+
 $filteredResults = array_filter($metaDataArray, function($item) use ($query) {
     return @stripos($item['searchData'], $query) !== false;
 });
