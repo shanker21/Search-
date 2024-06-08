@@ -21,8 +21,11 @@ class Index extends Template
 
     public function getMetaData()
     {
+        //get base url 
         $baseurl = $this->_storeManager->getStore()->getBaseUrl();
+        //Create to collection data
         $collection = $this->metaDataCollectionFactory->create();
+         //get the collection items value
         $items = $collection->getItems();
         
         $metaDataArray = [];
