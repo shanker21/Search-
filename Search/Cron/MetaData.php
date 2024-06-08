@@ -57,8 +57,9 @@ class MetaData
         $logger = new \Zend_Log();
         $logger->addWriter($writer);
         $logger->info("cron running");
-
+        //connection to the database
         $connection = $this->resourceConnection->getConnection();
+        //get store and parent from admin
         $storeCode = $this->scopeConfig->getValue('Apetito_searchconfig/search_store/store_view', ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
         $logger->info('Retrieved Store Code: ' . $storeCode);
         
@@ -73,16 +74,16 @@ class MetaData
         
         // Delete existing metadata
         $this->deleteExistingMetaData();
-
+        
         $categoryCollection = $this->categoryCollectionFactory->create();
         $categoryCollection->addAttributeToSelect('*');
         $categoryCollection->addAttributeToFilter('parent_id', $parentId);
         $categoryCollection->addAttributeToSort('position'); 
-
+         //call getcategorytree function
         $categoryTree = $this->getCategoryTree($categoryCollection);
 
         $logger->info('Category Tree: ' . print_r($categoryTree, true));
-
+         //call saveCategoryMetaDatafunction
         $this->saveCategoryMetaData($categoryTree);
         foreach ($categoryTree as $categoryData) {
             $categoryMetaData = $this->metadataFactory->create();
@@ -97,7 +98,7 @@ class MetaData
             $categoryMetaData->save();
             $logger->info('Saved Category MetaData: ' . print_r($categoryMetaData->getData(), true));
         }
-
+        ///fetch the cms page using searchCriteriaBuilder
         $searchCriteria = $this->searchCriteriaBuilder->addFilter('store_id', $storeCode, 'eq')->create();
         $pageList = $this->pageRepository->getList($searchCriteria);
         foreach ($pageList->getItems() as $page) {
@@ -118,9 +119,10 @@ class MetaData
             $logger->info('Saved CMS MetaData: ' . print_r($cmsMetaData->getData(), true));
         }
     }
-   
+   //create savecategory data
     public function saveCategoryMetaData($categoryTree)
     {
+        //get all categories for each loop 
         foreach ($categoryTree as $categoryData) {
             $categoryMetaData = $this->metadataFactory->create();
             $categoryMetaData->setData([
@@ -139,7 +141,7 @@ class MetaData
             }
         }
     }
-
+//get all $categoryCollectionfor each loop 
     public function getCategoryTree($categoryCollection)
     {
         $categoryTree = [];
@@ -162,7 +164,7 @@ class MetaData
 
         return $categoryTree;
     }
-
+//get all getChildCategories
     public function getChildCategories($parentId)
     {
         $childCollection = $this->categoryCollectionFactory->create();
