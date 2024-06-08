@@ -40,7 +40,7 @@
         align-items: center;
     }
 </style>
-
+//create search input and icon
 <div class="filter">
     <form id="search-form" method="get" action="<?php echo $block->getUrl('search/list/view'); ?>">
         <div class="search-container">
@@ -59,30 +59,34 @@
 <script type="text/javascript">
 require(['jquery', 'jquery/ui'], function($) { 
     $(document).ready(function() {
+        //get the metadata from block file
         var metaDataArray = <?php echo $block->getMetaData(); ?>;
 
         console.log(metaDataArray);
-
+//when clicking on icon using toggle active search input 
+//input class name .search-container class for search icon .search-ico
         $('.search-ico').on('click', function() {
             $('.search-container').toggleClass('active');
             if ($('.search-container').hasClass('active')) {
                 $('#search').focus();
-               // $('.burger-menu-bar3').removeClass('active');
             }
-            //$('.burger-menu-bar3').removeClass('active');
-            // if ($(window).width() < 768) { // Adjust breakpoint as needed
-            //     $('.nav-open').removeClass('active'); // Replace with your menu's active class
-            // }
         });
-
+//search autocomplete
         $('#search').autocomplete({
+            //function to create request and response
+        //minilength:2 when enter two word then result start
             source: function(request, response) {
+                //get matches value with request
+                //escapeRegex: Escape special characters in a regular expression string.
                 var matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), "i");
+                //query we get the search value
                 var query = $('#search').val();
+                //result we will display the search value with matcher the value or description,
+                //This grep() method in jQuery is used to finds the elements of an array that satisfies a filter function.
                 var results = $.grep(metaDataArray, function(value) {
                     return matcher.test(value.label) || matcher.test(value.description) || matcher.test(value.value);
                 });
-
+                //result is less than or greater than 0 to 5 the display only the 5 result using slice()
                 if (results.length > 0 || results.length > 5) {
                     results = results.slice(0, 5);
                     results.push({
@@ -102,23 +106,25 @@ require(['jquery', 'jquery/ui'], function($) {
                 $('#search-form')[0].reset();
             }
         }).data('ui-autocomplete')._renderItem = function(ul, item) {
+        //renderItem takes one item from the source and returns a formatted component to render.
+        //value is added using appendTO
             var listItem = $('<li>');
             var anchor = $('<a>').attr('href', item.value).appendTo(listItem);
             var divLabel = $('<div>').text(item.label).appendTo(anchor);
-            
+           //add class for jquery value label 
             if (item.label === "See All Results") {
                 divLabel.addClass('result-title');
             }
-
+//return list is append
             return listItem.appendTo(ul);
         };
 
         $('.searchbox-icon').on('click', function() {
             $('#search').toggle().focus();
         });
+        //when clicking on search on the outside  
         $(document).on('click', function(event) {
             var $target = $(event.target);
-            //console.log($target);
             if (!$target.closest('.search-ico').length) {
                 $('.search-container').removeClass('active');
                 $('#search').val(''); // Clear the input field
